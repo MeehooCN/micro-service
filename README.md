@@ -11,4 +11,5 @@
 
 登录认证:JWT
 
-![image](https://user-images.githubusercontent.com/68725781/169457221-77f877cf-0d3b-45c6-8524-f77be55307a9.png)
+![BE1097CD-96E9-44ae-869A-FB861499DC43](https://user-images.githubusercontent.com/68725781/169457811-71de312e-dd82-454c-b221-dcfa7ba2ec78.png)
+
