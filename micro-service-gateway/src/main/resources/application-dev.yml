@@ -1,0 +1,82 @@
+server:
+  port: 8002
+
+spring:
+  application:
+    # 服务逻辑名称
+    name: micro-service-gateway
+
+  redis:
+    host:127.0.0.1
+    port:6379
+
+  cloud:
+    nacos:
+      # 配置中心
+      config:
+        server-addr: 127.0.0.1:8848
+        file-extension: yml
+
+      # 注册中心
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+    # 服务网关
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lowerCaseServiceId: true
+      routes:
+        - id: producer-center-rpc
+          uri: lb://micro-service-producer
+          predicates:
+            - Path=/producer/**
+          filters:
+            # 降级配置
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/fallback
+            # 限流配置
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 3 # 每秒允许处理的请求数量
+                redis-rate-limiter.burstCapacity: 5 # 每秒最大处理的请求数量
+                key-resolver: "#{@ipKeyResolver}" # 限流策略，对应策略的Bean
+
+
+        - id: consumer-center-rpc
+          uri: lb://micro-service-consumer
+          predicates:
+            - Path=/consumer/**
+          filters:
+            # 降级配置
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/fallback
+            # 限流配置
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 3
+                redis-rate-limiter.burstCapacity: 5
+                key-resolver: "#{@ipKeyResolver}"
+
+        - id: security-center-rpc
+          uri: lb://micro-service-security
+          predicates:
+            - Path=/security/**
+          filters:
+            # 降级配置
+            - name: Hystrix
+              args:
+                name: fallbackcmd
+                fallbackUri: forward:/fallback
+            # 限流配置
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 3
+                redis-rate-limiter.burstCapacity: 5
+                key-resolver: "#{@ipKeyResolver}"
+

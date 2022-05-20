@@ -1,0 +1,18 @@
+server:
+  port: 8004
+
+spring:
+  # 服务逻辑名称
+  application:
+    name: micro-service-security
+
+  cloud:
+    nacos:
+      # 配置中心
+      config:
+        server-addr: 127.0.0.1:8848
+        file-extension: yml
+
+      # 注册中心
+      discovery:
+        server-addr: 127.0.0.1:8848
